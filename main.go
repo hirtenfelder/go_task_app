@@ -1,7 +1,6 @@
 package main
 
 import (
-	"awesomeProject/db"
 	"context"
 	"errors"
 	"fmt"
@@ -10,9 +9,10 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"taskApp/db"
 	"time"
 
-	_ "awesomeProject/task"
+	_ "taskApp/task"
 )
 
 var (

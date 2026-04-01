@@ -1,7 +1,7 @@
 package task
 
 import (
-	"awesomeProject/db"
+	"taskApp/db"
 
 	"github.com/jmoiron/sqlx"
 )
