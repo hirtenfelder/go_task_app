@@ -9,25 +9,25 @@ import (
 
 type mockService struct{}
 
-func (m *mockService) GetAllTasks() ([]*Task, error) {
+func (m *mockService) getAllTasks() ([]*Task, error) {
 	dueDate := "05.05.2026"
 	return []*Task{
 		{TaskPk: 1, Name: "Test", DueDate: &dueDate},
 	}, nil
 }
 
-func (m *mockService) GetTask(taskPk int) (*Task, error) {
+func (m *mockService) getTask(taskPk int) (*Task, error) {
 	dueDate := "05.05.2026"
 	return &Task{TaskPk: taskPk, Name: "Test", DueDate: &dueDate}, nil
 }
 
-func (m *mockService) CreateTask(task *Task) error {
+func (m *mockService) createTask(_ *Task) error {
 	return nil
 }
-func (m *mockService) DeleteTask(taskPk int) error {
+func (m *mockService) deleteTask(_ int) error {
 	return nil
 }
-func (m *mockService) UpdateTask(taskPk int, task *Task) error {
+func (m *mockService) updateTask(_ int, _ *Task) error {
 	return nil
 }
 
@@ -37,7 +37,7 @@ func TestGetAllTaskHandler(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/tasks", nil)
 	rec := httptest.NewRecorder()
 
-	handler.GetAllTaskHandler(rec, req)
+	handler.getAllTaskHandler(rec, req)
 
 	t.Run("StatusCode", func(t *testing.T) {
 		if rec.Code != http.StatusOK {

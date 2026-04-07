@@ -8,11 +8,11 @@ import (
 )
 
 type ServiceInterface interface {
-	GetAllTasks() ([]*Task, error)
-	GetTask(taskPk int) (*Task, error)
-	CreateTask(task *Task) error
-	DeleteTask(taskPk int) error
-	UpdateTask(taskPk int, task *Task) error
+	getAllTasks() ([]*Task, error)
+	getTask(taskPk int) (*Task, error)
+	createTask(task *Task) error
+	deleteTask(taskPk int) error
+	updateTask(taskPk int, task *Task) error
 }
 
 type Handler struct {
@@ -32,9 +32,9 @@ func NewHandler() *Handler {
 func (h *Handler) TaskHandler(response http.ResponseWriter, request *http.Request) {
 	switch request.Method {
 	case http.MethodGet:
-		h.GetAllTaskHandler(response, request)
+		h.getAllTaskHandler(response, request)
 	case http.MethodPost:
-		h.CreateTaskHandler(response, request)
+		h.createTaskHandler(response, request)
 	default:
 		http.Error(response, "Method not allowed", http.StatusMethodNotAllowed)
 	}
@@ -59,18 +59,18 @@ func (h *Handler) TaskOperationHandler(response http.ResponseWriter, request *ht
 
 	switch request.Method {
 	case http.MethodGet:
-		h.GetTaskHandler(response, request, taskPk)
+		h.getTaskHandler(response, request, taskPk)
 	case http.MethodPut:
-		h.UpdateTaskHandler(response, request, taskPk)
+		h.updateTaskHandler(response, request, taskPk)
 	case http.MethodDelete:
-		h.DeleteTaskHandler(response, request, taskPk)
+		h.deleteTaskHandler(response, request, taskPk)
 	default:
 		http.Error(response, "Method not allowed", http.StatusMethodNotAllowed)
 	}
 }
 
-func (h *Handler) GetAllTaskHandler(response http.ResponseWriter, _ *http.Request) {
-	tasks, err := h.service.GetAllTasks()
+func (h *Handler) getAllTaskHandler(response http.ResponseWriter, _ *http.Request) {
+	tasks, err := h.service.getAllTasks()
 	if err != nil {
 		msg := "Failed to retrieve tasks from database"
 		slog.Warn(msg)
@@ -85,8 +85,8 @@ func (h *Handler) GetAllTaskHandler(response http.ResponseWriter, _ *http.Reques
 	}
 }
 
-func (h *Handler) GetTaskHandler(response http.ResponseWriter, _ *http.Request, taskPk int) {
-	task, err := h.service.GetTask(taskPk)
+func (h *Handler) getTaskHandler(response http.ResponseWriter, _ *http.Request, taskPk int) {
+	task, err := h.service.getTask(taskPk)
 	if err != nil {
 		msg := "Task not found"
 		slog.Warn(msg)
@@ -101,13 +101,13 @@ func (h *Handler) GetTaskHandler(response http.ResponseWriter, _ *http.Request, 
 	}
 }
 
-func (h *Handler) CreateTaskHandler(response http.ResponseWriter, request *http.Request) {
+func (h *Handler) createTaskHandler(response http.ResponseWriter, request *http.Request) {
 	task := &Task{}
 	if json.NewDecoder(request.Body).Decode(task) != nil {
 		h.handleEncoderDecoderError(response)
 	}
 
-	if err := h.service.CreateTask(task); err != nil {
+	if err := h.service.createTask(task); err != nil {
 		msg := "Failed to create task in database"
 		slog.Warn(msg, "error", err)
 		http.Error(response, msg, http.StatusInternalServerError)
@@ -117,8 +117,8 @@ func (h *Handler) CreateTaskHandler(response http.ResponseWriter, request *http.
 	response.WriteHeader(http.StatusCreated)
 }
 
-func (h *Handler) DeleteTaskHandler(response http.ResponseWriter, _ *http.Request, taskPk int) {
-	if err := h.service.DeleteTask(taskPk); err != nil {
+func (h *Handler) deleteTaskHandler(response http.ResponseWriter, _ *http.Request, taskPk int) {
+	if err := h.service.deleteTask(taskPk); err != nil {
 		msg := "Failed to delete task from database"
 		slog.Warn(msg, "error", err)
 		http.Error(response, msg, http.StatusInternalServerError)
@@ -127,13 +127,13 @@ func (h *Handler) DeleteTaskHandler(response http.ResponseWriter, _ *http.Reques
 	response.WriteHeader(http.StatusNoContent)
 }
 
-func (h *Handler) UpdateTaskHandler(response http.ResponseWriter, request *http.Request, taskPk int) {
+func (h *Handler) updateTaskHandler(response http.ResponseWriter, request *http.Request, taskPk int) {
 	task := &Task{}
 	if json.NewDecoder(request.Body).Decode(task) != nil {
 		h.handleEncoderDecoderError(response)
 	}
 
-	if err := h.service.UpdateTask(taskPk, task); err != nil {
+	if err := h.service.updateTask(taskPk, task); err != nil {
 		msg := "Failed to update task in database"
 		slog.Warn(msg, "error", err)
 		http.Error(response, msg, http.StatusInternalServerError)
